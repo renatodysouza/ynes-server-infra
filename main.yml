@@ -1,0 +1,30 @@
+---
+- name: Install .NET Runtime on Ubuntu
+  hosts: ubuntu
+  become: yes
+  tasks:
+    - name: Install basic packages for HTTPS and transport
+      apt:
+        name:
+          - wget
+          - apt-transport-https
+          - software-properties-common
+          - gnupg
+        state: present
+        update_cache: yes
+
+    - name: Add Microsoft GPG key
+      ansible.builtin.apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+
+    - name: Add Microsoft .NET repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main"
+        state: present
+
+    - name: Update cache and install .NET runtime
+      apt:
+        name: dotnet-runtime-9.0
+        state: present
+        update_cache: yes
